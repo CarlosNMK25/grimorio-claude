@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>◉ El Grimorio de Claude</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0a0f; --bg-card: #101016; --bg-code: #15151d;
+            --purple-deep: #12101a; --purple-mid: #1f1a2e; --purple-glow: #8b5cf6; --purple-light: #a78bfa;
+            --gold: #d4a847; --gold-dim: #8b7355; --gold-light: #e4c77b;
+            --text: #c9c5c0; --text-dim: #7a756e; --text-muted: #4a4640;
+            --success: #7bad7e; --info: #6a8caf; --warning: #c9a227; --danger: #a65454;
+            --layer-1: #6b5b7e; --layer-2: #8b7355; --layer-3: #7e4545;
+            --sotano-bg: #08080a; --antorcha-apagada: #2a2520; --antorcha-encendida: #d4a847;
+        }
+        body { font-family: 'Crimson Text', serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; line-height: 1.6; }
+        
+        /* ENTRADA */
+        #entrada { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #0f0d12 0%, #08080a 70%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; transition: opacity 1.5s ease, visibility 1.5s ease; }
+        #entrada.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simbolo-entrada { font-size: 4rem; margin-bottom: 2rem; opacity: 0.8; animation: respirar 4s ease-in-out infinite; }
+        .titulo-entrada { font-family: 'Cinzel', serif; font-size: 2.2rem; color: var(--gold-dim); letter-spacing: 0.3rem; margin-bottom: 0.5rem; text-align: center; font-weight: 400; }
+        .subtitulo-entrada { color: var(--text-muted); font-style: italic; font-size: 1.1rem; margin-bottom: 3rem; letter-spacing: 0.1rem; }
+        .invitacion { color: var(--text-muted); font-size: 0.85rem; animation: pulsar 3s ease-in-out infinite; letter-spacing: 0.2rem; text-transform: lowercase; }
+        .version-badge { position: absolute; bottom: 2rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.1rem; }
+        @keyframes respirar { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.05); } }
+        @keyframes pulsar { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+        @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* CONTENIDO PRINCIPAL */
+        #grimorio { opacity: 0; transition: opacity 1s ease; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        #grimorio.visible { opacity: 1; }
+        header { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--purple-mid); margin-bottom: 2rem; }
+        header h1 { font-family: 'Cinzel', serif; font-size: 1.6rem; color: var(--gold-dim); margin-bottom: 0.5rem; font-weight: 400; letter-spacing: 0.2rem; }
+        header p { color: var(--text-muted); font-style: italic; font-size: 0.95rem; }
+        .leyenda-capas { display: flex; justify-content: center; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .leyenda-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); }
+        .leyenda-simbolo { font-size: 1rem; }
+        
+        /* NAVEGACIÓN */
+        .escuelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 0.5rem; margin-bottom: 2rem; padding: 1rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--purple-mid); }
+        .escuela-btn { background: transparent; border: 1px solid transparent; padding: 0.8rem 0.4rem; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; text-align: center; color: var(--text-dim); }
+        .escuela-btn:hover { border-color: var(--purple-mid); background: var(--purple-deep); color: var(--text); }
+        .escuela-btn.activa { border-color: var(--gold-dim); background: var(--purple-deep); color: var(--gold); }
+        .escuela-icono { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+        .escuela-nombre { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.05rem; }
+        
+        /* TRAMPILLA AL SÓTANO */
+        .trampilla-container { margin: 2rem 0; }
+        
+        /* LA REJILLA MISTERIOSA */
+        .rejilla-container { margin: 2rem 0; padding: 1rem 0; }
+        .rejilla { height: 8px; background: var(--bg-card); border-radius: 4px; overflow: hidden; position: relative; opacity: 0.3; transition: all 0.5s ease; }
+        .rejilla:hover { opacity: 0.5; }
+        .rejilla-lineas { display: flex; justify-content: space-around; height: 100%; }
+        .rejilla-lineas span { width: 1px; height: 100%; background: var(--purple-mid); }
+        
+        /* TEMBLORES */
+        @keyframes temblor-leve {
+            0%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-2px); }
+            20% { transform: translateX(2px); }
+            30% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            50% { transform: translateX(-1px); }
+            60% { transform: translateX(1px); }
+            70% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+            90% { transform: translateX(0); }
+        }
+        @keyframes temblor-fuerte {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            5% { transform: translateX(-5px) rotate(-0.5deg); }
+            10% { transform: translateX(5px) rotate(0.5deg); }
+            15% { transform: translateX(-6px) rotate(-0.5deg); }
+            20% { transform: translateX(6px) rotate(0.5deg); }
+            25% { transform: translateX(-5px) rotate(-0.3deg); }
+            30% { transform: translateX(5px) rotate(0.3deg); }
+            35% { transform: translateX(-4px) rotate(-0.2deg); }
+            40% { transform: translateX(4px) rotate(0.2deg); }
+            50% { transform: translateX(-3px); }
+            60% { transform: translateX(3px); }
+            70% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
+            90% { transform: translateX(-1px); }
+        }
+        .temblor-leve { animation: temblor-leve 0.5s ease; }
+        .temblor-fuerte { animation: temblor-fuerte 0.8s ease; }
+        
+        /* Rejilla abriéndose */
+        @keyframes rejilla-abrir {
+            0% { height: 8px; opacity: 0.3; }
+            30% { height: 20px; opacity: 0.6; }
+            60% { height: 8px; opacity: 0.8; }
+            100% { height: 0; opacity: 0; }
+        }
+        .rejilla.abriendo { animation: rejilla-abrir 1s ease forwards; }
+        
+        /* Trampilla emergiendo */
+        @keyframes trampilla-emerger {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            50% { opacity: 0.7; transform: translateY(-5px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .trampilla-container.emergiendo { display: block !important; animation: trampilla-emerger 0.8s ease forwards; }
+        
+        /* Leyenda clickeable */
+        .leyenda-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); cursor: pointer; padding: 0.3rem 0.5rem; border-radius: 4px; transition: all 0.3s ease; user-select: none; }
+        .leyenda-item:hover { background: var(--purple-deep); color: var(--text); }
+        .leyenda-item:active { transform: scale(0.95); }
+        .leyenda-item.activado { color: var(--gold); background: var(--purple-mid); }
+        
+        .trampilla { background: linear-gradient(180deg, var(--bg-card) 0%, var(--sotano-bg) 100%); border: 1px solid var(--purple-mid); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.6s ease; position: relative; overflow: hidden; }
+        .trampilla:hover { border-color: var(--gold-dim); box-shadow: 0 5px 30px rgba(212, 168, 71, 0.1); }
+        .trampilla::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at center bottom, rgba(212, 168, 71, 0.05) 0%, transparent 70%); pointer-events: none; transition: all 0.8s ease; }
+        .trampilla:hover::before { background: radial-gradient(ellipse at center bottom, rgba(212, 168, 71, 0.15) 0%, transparent 70%); }
+        .trampilla-simbolo { font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.6; transition: all 0.5s ease; }
+        .trampilla:hover .trampilla-simbolo { opacity: 1; transform: translateY(3px); }
+        .trampilla-texto { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.15rem; transition: color 0.6s ease; }
+        .trampilla:hover .trampilla-texto { color: var(--gold-dim); }
+        .trampilla-subtexto { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; font-style: italic; opacity: 0.6; transition: all 0.6s ease 0.2s; }
+        .trampilla:hover .trampilla-subtexto { opacity: 1; color: var(--text-dim); }
+        .antorchas-preview { display: flex; justify-content: center; gap: 0.8rem; margin-top: 1rem; }
+        .antorcha-mini { font-size: 0.9rem; opacity: 0.3; transition: all 0.3s ease; }
+        .antorcha-mini.encendida { opacity: 1; color: var(--antorcha-encendida); text-shadow: 0 0 10px var(--gold-dim); }
+        
+        /* ESCUELAS */
+        .escuela-contenido { display: none; animation: aparecer 0.5s ease; }
+        .escuela-contenido.visible { display: block; }
+        .escuela-intro { background: var(--bg-card); padding: 1.2rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 2px solid var(--purple-mid); }
+        .escuela-intro h2 { font-family: 'Cinzel', serif; color: var(--gold-dim); margin-bottom: 0.3rem; font-size: 1.2rem; font-weight: 400; letter-spacing: 0.1rem; }
+        .escuela-intro p { color: var(--text-dim); font-size: 0.95rem; }
+        
+        /* HECHIZOS */
+        .hechizo { background: var(--bg-card); border: 1px solid var(--purple-mid); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; transition: all 0.4s ease; }
+        .hechizo:hover { border-color: var(--purple-glow); }
+        .hechizo-cabecera { padding: 1rem 1.2rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s ease; }
+        .hechizo-cabecera:hover { background: var(--purple-deep); }
+        .hechizo-cabecera:hover .hechizo-info h3 { color: var(--gold-light); transition: color 0.5s ease; }
+        .hechizo-cabecera:hover .mini-desc { color: var(--text); transition: color 0.6s ease 0.1s; }
+        .hechizo-titulo { display: flex; align-items: center; gap: 0.8rem; }
+        .hechizo-icono { font-size: 1.2rem; opacity: 0.7; transition: opacity 0.4s ease; }
+        .hechizo-cabecera:hover .hechizo-icono { opacity: 1; }
+        .hechizo-info h3 { font-family: 'Cinzel', serif; color: var(--text); font-size: 1rem; margin-bottom: 0.1rem; font-weight: 400; transition: color 0.4s ease; }
+        .hechizo-info .mini-desc { color: var(--text-dim); font-size: 0.85rem; transition: color 0.4s ease; }
+        .hechizo-flecha { color: var(--text-muted); transition: transform 0.3s ease; font-size: 0.8rem; }
+        .hechizo.abierto .hechizo-flecha { transform: rotate(180deg); }
+        .hechizo-contenido { display: none; padding: 0 1.2rem 1.2rem; }
+        .hechizo.abierto .hechizo-contenido { display: block; animation: aparecer 0.3s ease; }
+        
+        /* REQUISITOS */
+        .requisitos { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--purple-mid); }
+        .requisito { font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 3px; color: var(--text-dim); border: 1px solid var(--purple-mid); background: var(--purple-deep); }
+        
+        /* CAPAS */
+        .capa { margin-top: 1rem; border-radius: 6px; overflow: hidden; border: 1px solid var(--purple-mid); }
+        .capa-header { padding: 0.7rem 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.7rem; background: var(--purple-deep); transition: all 0.3s ease; }
+        .capa-header:hover { background: var(--purple-mid); }
+        .capa-nivel { font-size: 1rem; opacity: 0.8; }
+        .capa-titulo { font-family: 'Cinzel', serif; font-size: 0.85rem; flex: 1; color: var(--text-dim); }
+        .capa-flecha { transition: transform 0.3s ease; opacity: 0.5; font-size: 0.7rem; }
+        .capa.abierta .capa-flecha { transform: rotate(180deg); }
+        .capa.capa-1 .capa-titulo { color: var(--layer-1); }
+        .capa.capa-2 .capa-titulo { color: var(--layer-2); }
+        .capa.capa-3 .capa-titulo { color: var(--layer-3); }
+        .capa-contenido { display: none; padding: 1rem; background: var(--bg-dark); }
+        .capa.abierta .capa-contenido { display: block; animation: aparecer 0.3s ease; }
+        
+        /* FORMULAS */
+        .formula { background: var(--purple-deep); padding: 0.9rem 1rem; border-radius: 6px; margin-bottom: 0.6rem; cursor: pointer; transition: all 0.4s ease; position: relative; border-left: 2px solid var(--purple-mid); }
+        .formula:hover { background: var(--purple-mid); border-left-color: var(--gold-dim); }
+        .formula:hover .formula-situacion { color: var(--text-dim); transition: color 0.4s ease; }
+        .formula:hover .formula-texto { color: #9ed19f; transition: color 0.3s ease; }
+        .formula-situacion { color: var(--text-muted); font-size: 0.7rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.1rem; transition: color 0.3s ease; }
+        .formula-texto { color: var(--success); font-size: 0.95rem; font-style: italic; transition: color 0.3s ease; }
+        .formula-texto .variable { color: var(--gold); background: rgba(212, 168, 71, 0.1); padding: 0.1rem 0.3rem; border-radius: 3px; font-style: normal; }
+        .copiado { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 0.75rem; opacity: 0; transition: opacity 0.3s ease; }
+        .formula.mostrar-copiado .copiado { opacity: 1; }
+        
+        /* MECANISMO */
+        .mecanismo-texto { color: var(--text-dim); margin-bottom: 0.8rem; line-height: 1.7; font-size: 0.95rem; }
+        .limitaciones { background: rgba(166, 84, 84, 0.1); border: 1px solid rgba(166, 84, 84, 0.2); border-radius: 6px; padding: 0.9rem; margin-top: 0.8rem; }
+        .limitaciones-titulo { color: var(--danger); font-family: 'Cinzel', serif; font-size: 0.8rem; margin-bottom: 0.4rem; }
+        .limitaciones ul { color: var(--text-dim); padding-left: 1rem; font-size: 0.85rem; }
+        .limitaciones li { margin-bottom: 0.2rem; }
+        
+        /* CÓDIGO */
+        .codigo-bloque { background: var(--bg-code); border-radius: 6px; padding: 1rem; margin-bottom: 0.8rem; overflow-x: auto; border: 1px solid var(--purple-mid); }
+        .codigo-titulo { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1rem; margin-bottom: 0.6rem; }
+        .codigo { font-family: 'Fira Code', monospace; font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); white-space: pre-wrap; }
+        .codigo .comando { color: #c9a0dc; }
+        .codigo .parametro { color: #7eb8da; }
+        .codigo .valor { color: var(--success); }
+        .codigo .comentario { color: var(--text-muted); font-style: italic; }
+        .codigo .tipo { color: var(--gold); }
+        .nota-codigo { background: rgba(106, 140, 175, 0.1); border-left: 2px solid var(--info); padding: 0.7rem 0.9rem; margin-top: 0.8rem; border-radius: 0 6px 6px 0; }
+        .nota-codigo p { color: var(--text-dim); font-size: 0.85rem; margin: 0.2rem 0; }
+        .nota-codigo code { font-family: 'Fira Code', monospace; background: rgba(139, 92, 246, 0.15); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.8rem; color: var(--purple-light); }
+        
+        /* MENSAJE INICIAL */
+        #mensaje-inicial { text-align: center; padding: 3rem 2rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--purple-mid); }
+        #mensaje-inicial .icono { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.6; }
+        #mensaje-inicial h3 { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 1.1rem; margin-bottom: 0.8rem; font-weight: 400; }
+        #mensaje-inicial p { color: var(--text-muted); max-width: 400px; margin: 0 auto; font-size: 0.95rem; }
+        
+        /* SÓTANO */
+        #sotano { display: none; animation: aparecer 0.8s ease; }
+        #sotano.visible { display: block; }
+        .sotano-header { text-align: center; padding: 2rem 0; margin-bottom: 2rem; }
+        .sotano-header h2 { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 1.3rem; font-weight: 400; letter-spacing: 0.2rem; margin-bottom: 0.5rem; }
+        .sotano-header p { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
+        .volver-superficie { display: inline-block; margin-bottom: 2rem; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; transition: color 0.3s ease; }
+        .volver-superficie:hover { color: var(--text); }
+        
+        .antorchas-container { display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px; margin: 0 auto; }
+        .antorcha { background: var(--bg-card); border: 1px solid var(--purple-mid); border-radius: 8px; padding: 1.5rem; transition: all 0.6s ease; }
+        .antorcha.encendida { border-color: var(--gold-dim); }
+        .antorcha.encendida .antorcha-llama { color: var(--antorcha-encendida); text-shadow: 0 0 20px var(--gold-dim); }
+        
+        /* ILUMINACIÓN AL HOVER - La antorcha ilumina el texto */
+        .antorcha:hover { border-color: var(--gold-dim); background: linear-gradient(180deg, var(--bg-card) 0%, rgba(212, 168, 71, 0.03) 100%); }
+        .antorcha:hover .antorcha-titulo { color: var(--gold-light); transition: color 0.8s ease 0.3s; }
+        .antorcha:hover .antorcha-pregunta { color: var(--text); transition: color 1s ease 0.5s; }
+        .antorcha:hover .antorcha-llama { opacity: 0.8; text-shadow: 0 0 15px var(--gold-dim); transition: all 0.6s ease; }
+        .antorcha:hover .antorcha-input::placeholder { color: var(--text-dim); transition: color 1s ease 0.7s; }
+        .antorcha-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; cursor: pointer; }
+        .antorcha-llama { font-size: 1.5rem; transition: all 0.6s ease; opacity: 0.3; }
+        .antorcha.encendida .antorcha-llama { opacity: 1; }
+        .antorcha-titulo { font-family: 'Cinzel', serif; color: var(--text-muted); font-size: 1rem; letter-spacing: 0.1rem; transition: color 0.6s ease; }
+        .antorcha.encendida .antorcha-titulo { color: var(--gold); }
+        .antorcha-pregunta { color: var(--text-muted); font-style: italic; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; padding-left: 1rem; border-left: 2px solid var(--purple-mid); transition: color 0.8s ease, border-color 0.8s ease; }
+        .antorcha:hover .antorcha-pregunta { border-left-color: var(--gold-dim); }
+        .antorcha-input { width: 100%; background: var(--bg-dark); border: 1px solid var(--purple-mid); border-radius: 6px; padding: 1rem; color: var(--text); font-family: 'Crimson Text', serif; font-size: 0.95rem; resize: vertical; min-height: 80px; transition: border-color 0.3s ease, background 0.5s ease; }
+        .antorcha-input:focus { outline: none; border-color: var(--gold-dim); background: rgba(20, 18, 25, 1); }
+        .antorcha-input::placeholder { color: var(--text-muted); font-style: italic; transition: color 0.8s ease; }
+        .antorcha-reflexion { background: var(--purple-deep); border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+        .antorcha-reflexion-titulo { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1rem; margin-bottom: 0.5rem; }
+        .antorcha-reflexion-texto { color: var(--text-dim); font-style: italic; font-size: 0.9rem; }
+        
+        /* REVELACIÓN - La traducción pa' mortales */
+        .revelacion { display: none; margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(212, 168, 71, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%); border: 1px solid var(--gold-dim); border-radius: 6px; text-align: center; animation: revelar 0.8s ease; }
+        .revelacion.visible { display: block; }
+        .revelacion-icono { font-size: 1.2rem; margin-bottom: 0.5rem; animation: pulsar-oro 2s ease-in-out infinite; }
+        .revelacion-texto { font-family: 'Cinzel', serif; color: var(--gold-light); font-size: 0.95rem; letter-spacing: 0.05rem; line-height: 1.6; }
+        .revelacion-texto .letra { display: inline-block; animation: ordenar-letra 0.6s ease forwards; opacity: 0; }
+        @keyframes revelar { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulsar-oro { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; text-shadow: 0 0 10px var(--gold-dim); } }
+        @keyframes ordenar-letra { 
+            0% { opacity: 0; transform: translateY(-20px) rotate(15deg); filter: blur(3px); } 
+            40% { opacity: 0.6; transform: translateY(5px) rotate(-5deg); filter: blur(1px); } 
+            100% { opacity: 1; transform: translateY(0) rotate(0deg); filter: blur(0); } 
+        }
+        
+        /* Efecto de resplandor cuando aparece la revelación */
+        .antorcha:has(.revelacion.visible) { 
+            border-color: var(--gold) !important; 
+            box-shadow: 0 0 30px rgba(212, 168, 71, 0.2); 
+        }
+        .antorcha:has(.revelacion.visible) .antorcha-llama { 
+            text-shadow: 0 0 25px var(--gold), 0 0 50px var(--gold-dim); 
+        }
+        
+        /* MANIFESTO (OCULTO HASTA TIER_2) */
+        .manifesto-puerta { text-align: center; padding: 3rem; background: var(--sotano-bg); border: 1px solid var(--purple-mid); border-radius: 8px; margin-top: 2rem; }
+        .manifesto-puerta.cerrada { opacity: 0.5; }
+        .manifesto-puerta.abierta { border-color: var(--gold-dim); opacity: 1; }
+        .manifesto-simbolo { font-size: 2rem; margin-bottom: 1rem; }
+        .manifesto-texto { font-family: 'Cinzel', serif; color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.1rem; }
+        
+        /* FOOTER */
+        footer { text-align: center; padding: 2rem 0; margin-top: 2rem; border-top: 1px solid var(--purple-mid); }
+        footer p { color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.05rem; }
+        
+        @media (max-width: 768px) {
+            .escuelas { grid-template-columns: repeat(5, 1fr); }
+            .titulo-entrada { font-size: 1.8rem; }
+            .antorchas-preview { gap: 0.5rem; }
+        }
+        
+        /* HECHIZOS RELACIONADOS */
+        .hechizos-relacionados { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--purple-mid); }
+        .relacionados-titulo { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1rem; margin-bottom: 0.6rem; }
+        .relacionados-lista { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .relacionado { font-size: 0.75rem; padding: 0.3rem 0.6rem; background: var(--purple-deep); border: 1px solid var(--purple-mid); border-radius: 4px; color: var(--text-dim); cursor: pointer; transition: all 0.3s ease; }
+        .relacionado:hover { border-color: var(--gold-dim); color: var(--gold); background: var(--purple-mid); }
+
+        @media print {
+            body { background: white; color: #1a1a1a; }
+            #entrada, .escuelas, .trampilla-container, .rejilla-container, #sotano { display: none !important; }
+            #grimorio { opacity: 1 !important; padding: 1rem; }
+            header { border-bottom-color: #ddd; }
+            .hechizo { break-inside: avoid; border-color: #ddd; background: white; margin-bottom: 0.8rem; }
+            .hechizo-contenido, .capa-contenido { display: block !important; }
+            .hechizo-flecha, .capa-flecha { display: none; }
+            .codigo-bloque { border-color: #ddd; background: #f5f5f5; }
+            .formula { background: #f9f9f9; border-left-color: #ccc; }
+            .limitaciones { background: #fff3f3; border-color: #ffcccc; }
+            .nota-codigo { background: #f0f8ff; border-left-color: #6a8caf; }
+            .escuela-intro { background: white; border-left-color: #ddd; }
+            footer { border-top-color: #ddd; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ENTRADA -->
+    <div id="entrada" onclick="entrar()">
+        <div class="simbolo-entrada">◉</div>
+        <h1 class="titulo-entrada">EL GRIMORIO</h1>
+        <p class="subtitulo-entrada">Manual de invocaciones</p>
+        <span class="invitacion">— toca para abrir —</span>
+        <span class="version-badge">v4.0</span>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="grimorio">
+        <header>
+            <h1>◉ El Grimorio de Claude</h1>
+            <p>Descubre. Comprende. Domina.</p>
+            <div class="leyenda-capas">
+                <div class="leyenda-item" id="leyenda-aprendiz" onclick="comboSecreto('aprendiz')"><span class="leyenda-simbolo">○</span><span>Aprendiz</span></div>
+                <div class="leyenda-item" id="leyenda-mago" onclick="comboSecreto('mago')"><span class="leyenda-simbolo">◐</span><span>Mago</span></div>
+                <div class="leyenda-item" id="leyenda-archimago" onclick="comboSecreto('archimago')"><span class="leyenda-simbolo">●</span><span>Archimago</span></div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <nav class="escuelas">
+            <button class="escuela-btn" onclick="mostrarEscuela('busqueda')"><span class="escuela-icono">🜄</span><span class="escuela-nombre">Búsqueda</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('archivos')"><span class="escuela-icono">🜃</span><span class="escuela-nombre">Archivos</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('codigo')"><span class="escuela-icono">🜂</span><span class="escuela-nombre">Código</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('memoria')"><span class="escuela-icono">☽</span><span class="escuela-nombre">Memoria</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('notas')"><span class="escuela-icono">🜁</span><span class="escuela-nombre">Notas</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('email')"><span class="escuela-icono">☿</span><span class="escuela-nombre">Email</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('calendario')"><span class="escuela-icono">☉</span><span class="escuela-nombre">Tiempo</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('drive')"><span class="escuela-icono">◈</span><span class="escuela-nombre">Drive</span></button>
+            <button class="escuela-btn" onclick="mostrarEscuela('python')"><span class="escuela-icono">𓆙</span><span class="escuela-nombre">Python</span></button>
+        </nav>
+
+        <!-- MENSAJE INICIAL -->
+        <div id="mensaje-inicial">
+            <div class="icono">◎</div>
+            <h3>Elige una Escuela</h3>
+            <p>Cada escuela contiene hechizos con capas de profundidad. El conocimiento se revela a quien lo busca.</p>
+        </div>
+
+        <!-- ESCUELA: BÚSQUEDA 🜄 -->
+        <section id="escuela-busqueda" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>🜄 Escuela de Búsqueda</h2>
+                <p>El conocimiento fluye como el agua. Aprende a canalizarlo.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-buscar-red">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Buscar en la red</h3><span class="mini-desc">Invoca conocimiento de internet</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span><span class="requisito">requiere conexión</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">información general</div><div class="formula-texto">"Búscame información sobre <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">documentación</div><div class="formula-texto">"Busca la documentación oficial de <span class="variable">[herramienta]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">noticias</div><div class="formula-texto">"¿Qué novedades hay sobre <span class="variable">[tema]</span>?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude envía tu consulta a un motor de búsqueda y recibe los 10 resultados más relevantes. Lee títulos, descripciones y URLs, y sintetiza la información.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo obtiene los 10 primeros resultados</li><li>No puede acceder a contenido detrás de login</li></ul></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">web_search</span>
+├── <span class="parametro">query</span>: <span class="valor">"tutorial python listas"</span>
+└── <span class="tipo">return</span>: [{ title, url, snippet }]</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-leer-pagina')">Leer una página</span>
+                        <span class="relacionado" onclick="irAHechizo('drive', 'hechizo-buscar-drive')">Buscar en Drive</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-leer-pagina">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Leer una página</h3><span class="mini-desc">Extrae el contenido de una URL</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span><span class="requisito">requiere conexión</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">leer</div><div class="formula-texto">"Lee esta página: <span class="variable">[URL]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">resumir</div><div class="formula-texto">"Lee y resúmeme: <span class="variable">[URL]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude accede a la URL, descarga el HTML, lo convierte a markdown limpio y lo procesa. Puede extraer texto, imágenes embebidas y estructura del documento.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>No puede acceder a contenido detrás de login</li><li>JavaScript dinámico puede no cargarse</li><li>Algunos sitios bloquean bots</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">web_fetch</span>
+├── <span class="parametro">url</span>: <span class="valor">"https://..."</span>
+└── <span class="tipo">return</span>: { content, title }</pre></div>
+                            <div class="nota-codigo"><p>La URL debe incluir <code>https://</code></p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-buscar-red')">Buscar en la red</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: ARCHIVOS 🜃 -->
+        <section id="escuela-archivos" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>🜃 Escuela de Archivos</h2>
+                <p>Lo material. Los pergaminos digitales de tu sistema.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-leer-archivos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Leer archivos</h3><span class="mini-desc">Ver contenido de archivos locales</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">MCP Filesystem</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">leer</div><div class="formula-texto">"Lee el archivo <span class="variable">[nombre]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">revisar código</div><div class="formula-texto">"Revisa mi código en <span class="variable">[nombre.py]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude accede al sistema de archivos a través del servidor MCP. Lee el contenido completo del archivo y lo carga en memoria para análisis.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo puede leer archivos en carpetas autorizadas</li><li>Archivos muy grandes pueden exceder límites de tokens</li><li>Archivos binarios se muestran codificados</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">Filesystem:read_file</span>
+├── <span class="parametro">path</span>: <span class="valor">"/ruta/archivo.py"</span>
+└── <span class="tipo">return</span>: <span class="valor">"[contenido]"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-editar-archivos')">Editar archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-buscar-archivos')">Buscar archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-leer-pagina')">Leer una página</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-crear-archivos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">△</span>
+                        <div class="hechizo-info"><h3>Crear archivos</h3><span class="mini-desc">Materializa nuevos archivos</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">MCP Filesystem</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">crear</div><div class="formula-texto">"Crea un archivo <span class="variable">[nombre]</span> que haga <span class="variable">[qué]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">guardar</div><div class="formula-texto">"Guarda ese código en <span class="variable">[nombre]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">El servidor MCP escribe el contenido especificado en la ruta indicada. Si el archivo existe, lo sobrescribe completamente.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo puede escribir en carpetas autorizadas</li><li>No hay confirmación antes de sobrescribir</li><li>Permisos del sistema aplican</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">Filesystem:write_file</span>
+├── <span class="parametro">path</span>: <span class="valor">"/ruta/nuevo.py"</span>
+├── <span class="parametro">content</span>: <span class="valor">"print('hola')"</span>
+└── <span class="tipo">return</span>: <span class="valor">"Creado"</span></pre></div>
+                            <div class="nota-codigo"><p>Si existe, lo sobrescribe</p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-editar-archivos')">Editar archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('codigo', 'hechizo-ejecutar-codigo')">Ejecutar código</span>
+                        <span class="relacionado" onclick="irAHechizo('codigo', 'hechizo-compartir-archivos')">Compartir archivos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-editar-archivos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">▽</span>
+                        <div class="hechizo-info"><h3>Editar archivos</h3><span class="mini-desc">Modifica sin borrar todo</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">MCP</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">corregir</div><div class="formula-texto">"En <span class="variable">[archivo]</span>, corrige <span class="variable">[error]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">reemplazar</div><div class="formula-texto">"Cambia <span class="variable">[esto]</span> por <span class="variable">[esto otro]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude lee el archivo, identifica el texto a reemplazar, genera un diff y aplica los cambios. Es más eficiente que reescribir todo el archivo.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>El texto a buscar debe existir exactamente</li><li>Archivos muy grandes pueden ser lentos</li><li>Solo texto plano, no binarios</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">Filesystem:edit_file</span>
+├── <span class="parametro">path</span>: <span class="valor">"/ruta/archivo.py"</span>
+├── <span class="parametro">edits</span>: [{ oldText, newText }]
+└── <span class="tipo">return</span>: <span class="valor">"[diff]"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-crear-archivos')">Crear archivos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-buscar-archivos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Buscar archivos</h3><span class="mini-desc">Localiza archivos por nombre o contenido</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">MCP Filesystem</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">por nombre</div><div class="formula-texto">"Busca archivos que se llamen <span class="variable">[nombre]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">por tipo</div><div class="formula-texto">"Busca todos los <span class="variable">[.py]</span> en <span class="variable">[carpeta]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">por contenido</div><div class="formula-texto">"Busca archivos que contengan <span class="variable">[texto]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">El MCP escanea el directorio recursivamente buscando coincidencias por nombre (glob pattern) o contenido (grep). Devuelve rutas y snippets relevantes.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo busca en carpetas autorizadas</li><li>Búsquedas grandes pueden tardar</li><li>No indexa, escanea en tiempo real</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">Filesystem:search_files</span>
+├── <span class="parametro">path</span>: <span class="valor">"/carpeta"</span>
+├── <span class="parametro">pattern</span>: <span class="valor">"*.py"</span>
+└── <span class="tipo">return</span>: [<span class="valor">"archivo1.py"</span>, ...]</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-ver-estructura')">Ver estructura</span>
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-buscar-red')">Buscar en la red</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-ver-estructura">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">≡</span>
+                        <div class="hechizo-info"><h3>Ver estructura</h3><span class="mini-desc">Explora carpetas y subcarpetas</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">MCP Filesystem</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ver</div><div class="formula-texto">"¿Qué hay en la carpeta <span class="variable">[ruta]</span>?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">estructura</div><div class="formula-texto">"Muéstrame la estructura de <span class="variable">[proyecto]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">El MCP lista recursivamente archivos y carpetas, generando un árbol jerárquico. Marca directorios y archivos con prefijos [DIR] y [FILE].</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Árboles muy profundos pueden ser grandes</li><li>No muestra archivos ocultos por defecto</li><li>Permisos pueden bloquear carpetas</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comandos</div><pre class="codigo"><span class="comando">Filesystem:list_directory</span>
+├── <span class="parametro">path</span>: <span class="valor">"/carpeta"</span>
+└── <span class="tipo">return</span>: [<span class="valor">"[DIR] sub"</span>, <span class="valor">"[FILE] x.py"</span>]
+
+<span class="comando">Filesystem:directory_tree</span>
+├── <span class="parametro">path</span>: <span class="valor">"/carpeta"</span>
+└── <span class="tipo">return</span>: { name, type, children }</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-buscar-archivos')">Buscar archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: CÓDIGO 🜂 -->
+        <section id="escuela-codigo" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>🜂 Escuela de Código</h2>
+                <p>El fuego transforma. Aquí el código cobra vida.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-ejecutar-codigo">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">⚡</span>
+                        <div class="hechizo-info"><h3>Ejecutar código</h3><span class="mini-desc">Da vida a tus scripts</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">local</span><span class="requisito">Desktop Commander</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ejecutar</div><div class="formula-texto">"Ejecuta el archivo <span class="variable">[nombre.py]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">probar</div><div class="formula-texto">"Ejecuta este código y dime qué sale"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Desktop Commander crea un proceso hijo, ejecuta el comando y captura stdout/stderr en tiempo real. Puede mantener sesiones interactivas (REPL) para Python, Node, etc.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Timeout por defecto de 30 segundos</li><li>Procesos interactivos necesitan interact_with_process</li><li>No tiene GUI, solo terminal</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comandos</div><pre class="codigo"><span class="comando">Desktop Commander:start_process</span>
+├── <span class="parametro">command</span>: <span class="valor">"python3 script.py"</span>
+├── <span class="parametro">timeout_ms</span>: <span class="valor">30000</span>
+└── <span class="tipo">return</span>: { pid, output }
+
+<span class="comando">Desktop Commander:interact_with_process</span>
+├── <span class="parametro">pid</span>: <span class="valor">12345</span>
+├── <span class="parametro">input</span>: <span class="valor">"print(2+2)"</span>
+└── <span class="tipo">return</span>: <span class="valor">"4"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-crear-archivos')">Crear archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-errores')">Cuando tienes errores</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-compartir-archivos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">△</span>
+                        <div class="hechizo-info"><h3>Compartir archivos</h3><span class="mini-desc">Entrega lo creado al humano</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo Claude.ai</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">compartir</div><div class="formula-texto">"Dame el archivo para descargarlo"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">exportar</div><div class="formula-texto">"Expórtame eso como <span class="variable">[PDF/Word/Excel]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude mueve los archivos a una carpeta especial (/mnt/user-data/outputs/) y genera un enlace de descarga temporal que puedes abrir en tu navegador.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo en claude.ai, no en API</li><li>Enlaces expiran después de un tiempo</li><li>Tamaño máximo por archivo</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">present_files</span>
+├── <span class="parametro">filepaths</span>: [<span class="valor">"/ruta/archivo.pdf"</span>]
+└── <span class="tipo">return</span>: <span class="valor">"[enlace descarga]"</span></pre></div>
+                            <div class="nota-codigo"><p>Mueve a <code>/mnt/user-data/outputs/</code> y genera enlace</p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-crear-archivos')">Crear archivos</span>
+                        <span class="relacionado" onclick="irAHechizo('codigo', 'hechizo-ejecutar-codigo')">Ejecutar código</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: MEMORIA ☽ -->
+        <section id="escuela-memoria" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>☽ Escuela de Memoria</h2>
+                <p>La luna refleja el pasado. Aquí viven los recuerdos.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-invocar-recuerdos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Invocar recuerdos</h3><span class="mini-desc">Busca en conversaciones pasadas</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span><span class="requisito">Claude.ai</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">buscar tema</div><div class="formula-texto">"¿Hemos hablado antes de <span class="variable">[tema]</span>?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">recuperar</div><div class="formula-texto">"Busca el código que hicimos sobre <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">retomar</div><div class="formula-texto">"¿Dónde lo dejamos con <span class="variable">[proyecto]</span>?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude busca en un índice de tus conversaciones por palabras clave. Devuelve fragmentos relevantes con enlaces a los chats originales.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo el espacio actual (dentro o fuera de Proyecto)</li><li>Máximo ~10 resultados</li></ul></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">conversation_search</span>
+├── <span class="parametro">query</span>: <span class="valor">"bucles python"</span>
+├── <span class="parametro">max_results</span>: <span class="valor">5</span>
+└── <span class="tipo">return</span>: [{ chat_url, snippet, updated_at }]</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-ver-chats')">Ver chats recientes</span>
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-memoria-persistente')">Memoria persistente</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-ver-chats">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">≡</span>
+                        <div class="hechizo-info"><h3>Ver chats recientes</h3><span class="mini-desc">Lista conversaciones por fecha</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span><span class="requisito">Claude.ai</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">recientes</div><div class="formula-texto">"¿De qué hemos hablado últimamente?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ayer</div><div class="formula-texto">"¿De qué hablamos ayer?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">continuar</div><div class="formula-texto">"Continúa nuestra última conversación"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">recent_chats</span>
+├── <span class="parametro">n</span>: <span class="valor">5</span>  <span class="comentario">← 1 a 20</span>
+├── <span class="parametro">sort_order</span>: <span class="valor">"desc"</span>
+├── <span class="parametro">after</span>: <span class="valor">"2025-01-01T00:00:00Z"</span>
+└── <span class="tipo">return</span>: [{ url, updated_at, snippet }]</pre></div>
+                            <div class="nota-codigo"><p><code>conversation_search</code> busca por contenido<br><code>recent_chats</code> busca por tiempo</p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-invocar-recuerdos')">Invocar recuerdos</span>
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-memoria-persistente')">Memoria persistente</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-memoria-persistente">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">△</span>
+                        <div class="hechizo-info"><h3>Memoria persistente</h3><span class="mini-desc">Que Claude recuerde entre sesiones</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span><span class="requisito">Claude.ai</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">recordar</div><div class="formula-texto">"Recuerda que <span class="variable">[información]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">olvidar</div><div class="formula-texto">"Olvida lo de <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ver</div><div class="formula-texto">"¿Qué recuerdas de mí?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude mantiene una lista de "edits de memoria" que persisten entre conversaciones. Puedes añadir, ver o eliminar estos recuerdos.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Máximo 30 edits</li><li>200 caracteres por edit</li><li>No guarda datos sensibles</li></ul></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comandos</div><pre class="codigo"><span class="comando">memory_user_edits</span>
+├── <span class="parametro">command</span>: <span class="valor">"view"</span>  <span class="comentario">← ver todos</span>
+├── <span class="parametro">command</span>: <span class="valor">"add"</span>
+│   └── <span class="parametro">control</span>: <span class="valor">"Usuario trabaja con Python"</span>
+├── <span class="parametro">command</span>: <span class="valor">"remove"</span>
+│   └── <span class="parametro">line_number</span>: <span class="valor">3</span>
+└── <span class="parametro">command</span>: <span class="valor">"replace"</span>
+    ├── <span class="parametro">line_number</span>: <span class="valor">1</span>
+    └── <span class="parametro">replacement</span>: <span class="valor">"[nuevo texto]"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-invocar-recuerdos')">Invocar recuerdos</span>
+                        <span class="relacionado" onclick="irAHechizo('notas', 'hechizo-crear-notas')">Crear notas</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: DRIVE ◈ -->
+        <section id="escuela-drive" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>◈ Escuela de Drive</h2>
+                <p>El cristal almacena. Tu biblioteca en la nube.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-buscar-drive">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Buscar en Drive</h3><span class="mini-desc">Encuentra documentos en Google Drive</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">conexión</span><span class="requisito">Google Drive conectado</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">buscar</div><div class="formula-texto">"Busca en mi Drive <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">encontrar</div><div class="formula-texto">"Encuentra el documento de <span class="variable">[proyecto]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">recientes</div><div class="formula-texto">"¿Qué documentos he modificado esta semana?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Claude busca en tu Google Drive usando la API de Google. Puede filtrar por nombre, contenido, fecha de modificación, carpeta, y más. Devuelve fragmentos relevantes.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo archivos con permisos de acceso</li><li>Búsquedas muy amplias pueden tardar</li><li>No indexa en tiempo real, usa índice de Google</li></ul></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">google_drive_search</span>
+├── <span class="parametro">api_query</span>: <span class="valor">"name contains 'proyecto'"</span>
+├── <span class="parametro">semantic_query</span>: <span class="valor">"presupuesto Q1"</span>
+├── <span class="parametro">order_by</span>: <span class="valor">"modifiedTime desc"</span>
+└── <span class="tipo">return</span>: [{ id, name, snippet }]</pre></div>
+                            <div class="nota-codigo"><p>Operadores: <code>name contains</code>, <code>fullText contains</code>, <code>modifiedTime ></code></p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('drive', 'hechizo-leer-documento')">Leer documento</span>
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-buscar-red')">Buscar en la red</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-leer-documento">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Leer documento</h3><span class="mini-desc">Abre y lee un Google Doc</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">conexión</span><span class="requisito">Google Drive conectado</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">leer</div><div class="formula-texto">"Lee este documento: <span class="variable">[URL de Google Doc]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">resumir</div><div class="formula-texto">"Resúmeme el documento <span class="variable">[nombre]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Usando la API de Google Drive, Claude descarga el contenido del documento y lo convierte a texto plano o markdown para su análisis.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Requiere conexión activa a Google</li><li>Formatos complejos pueden perder formato</li><li>Solo documentos con acceso autorizado</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">google_drive_fetch</span>
+├── <span class="parametro">document_ids</span>: [<span class="valor">"1abc..."</span>]
+└── <span class="tipo">return</span>: [{ content }]</pre></div>
+                            <div class="nota-codigo"><p>El ID está en la URL: <code>docs.google.com/document/d/<strong>ID</strong>/edit</code></p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('drive', 'hechizo-buscar-drive')">Buscar en Drive</span>
+                        <span class="relacionado" onclick="irAHechizo('archivos', 'hechizo-leer-archivos')">Leer archivos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: NOTAS 🜁 -->
+        <section id="escuela-notas" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>🜁 Escuela de Notas</h2>
+                <p>El aire lleva ideas. Pensamientos capturados en Apple Notes.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-ver-notas">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Ver notas</h3><span class="mini-desc">Accede a Apple Notes</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">Mac</span><span class="requisito">MCP Apple Notes</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">listar</div><div class="formula-texto">"¿Qué notas tengo en Apple Notes?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">leer</div><div class="formula-texto">"Lee mi nota <span class="variable">[nombre]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">El MCP de Apple Notes usa AppleScript para consultar la base de datos de Notas y extraer títulos y contenido.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo en macOS</li><li>No puede leer notas bloqueadas</li><li>Imágenes se omiten en el texto</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comandos</div><pre class="codigo"><span class="comando">Apple Notes:list_notes</span>
+├── <span class="parametro">folder</span>: <span class="valor">"Notes"</span>
+├── <span class="parametro">limit</span>: <span class="valor">20</span>
+
+<span class="comando">Apple Notes:get_note_content</span>
+├── <span class="parametro">note_name</span>: <span class="valor">"Mi nota"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('notas', 'hechizo-crear-notas')">Crear notas</span>
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-invocar-recuerdos')">Invocar recuerdos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-crear-notas">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">△</span>
+                        <div class="hechizo-info"><h3>Crear notas</h3><span class="mini-desc">Guarda apuntes en Apple Notes</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">Mac</span><span class="requisito">MCP Apple Notes</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">crear</div><div class="formula-texto">"Crea una nota llamada <span class="variable">[título]</span> con <span class="variable">[contenido]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">guardar apuntes</div><div class="formula-texto">"Guarda esto como nota en Apple Notes"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Ejecuta AppleScript para crear una nueva nota en la app Notas de macOS, especificando carpeta, título y contenido.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Solo en macOS</li><li>Formato limitado a texto plano</li><li>La app Notas debe estar instalada</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">Apple Notes:add_note</span>
+├── <span class="parametro">name</span>: <span class="valor">"Título"</span>
+├── <span class="parametro">content</span>: <span class="valor">"Contenido..."</span>
+├── <span class="parametro">folder</span>: <span class="valor">"Aprendizaje"</span></pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('notas', 'hechizo-ver-notas')">Ver notas</span>
+                        <span class="relacionado" onclick="irAHechizo('memoria', 'hechizo-memoria-persistente')">Memoria persistente</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: EMAIL ☿ -->
+        <section id="escuela-email" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>☿ Escuela de Email</h2>
+                <p>Mercurio, el mensajero. Accede a tu correo.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-buscar-correos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Buscar correos</h3><span class="mini-desc">Busca en Gmail</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">conexión</span><span class="requisito">Gmail conectado</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">por remitente</div><div class="formula-texto">"Busca correos de <span class="variable">[persona]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">por tema</div><div class="formula-texto">"Busca correos sobre <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">sin leer</div><div class="formula-texto">"¿Tengo correos sin leer?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Usa la API de Gmail con el lenguaje de consulta nativo de Gmail. Busca en metadatos y contenido, devolviendo IDs de mensajes y snippets.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Requiere autorización OAuth</li><li>Máximo 100-500 resultados por consulta</li><li>No accede a borradores ni spam sin especificarlo</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comandos</div><pre class="codigo"><span class="comando">search_gmail_messages</span>
+├── <span class="parametro">q</span>: <span class="valor">"from:x@email.com is:unread"</span>
+└── <span class="tipo">return</span>: [{ message_id, thread_id, subject, snippet }]
+
+<span class="comando">read_gmail_thread</span>
+├── <span class="parametro">thread_id</span>: <span class="valor">"xyz"</span>
+├── <span class="parametro">include_full_messages</span>: <span class="valor">true</span></pre></div>
+                            <div class="nota-codigo"><p>Operadores: <code>from:</code> <code>to:</code> <code>subject:</code> <code>is:unread</code> <code>after:</code></p></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('email', 'hechizo-buscar-correos')">Buscar correos</span>
+                        <span class="relacionado" onclick="irAHechizo('busqueda', 'hechizo-buscar-red')">Buscar en la red</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: TIEMPO ☉ -->
+        <section id="escuela-calendario" class="escuela-contenido">
+            <div class="escuela-intro">
+                <h2>☉ Escuela del Tiempo</h2>
+                <p>El sol marca los ciclos. Tu calendario revelado.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-ver-agenda">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Ver agenda</h3><span class="mini-desc">Consulta tus eventos</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">conexión</span><span class="requisito">Google Calendar</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">hoy</div><div class="formula-texto">"¿Qué tengo hoy?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">semana</div><div class="formula-texto">"¿Qué tengo esta semana?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">buscar</div><div class="formula-texto">"¿Tengo algo sobre <span class="variable">[tema]</span>?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Consulta la API de Google Calendar filtrando eventos por rango de fechas, calendario y búsqueda de texto. Devuelve título, fecha, hora y ubicación.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Requiere autorización OAuth</li><li>Solo calendarios con acceso concedido</li><li>Zona horaria debe coincidir</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">list_gcal_events</span>
+├── <span class="parametro">calendar_id</span>: <span class="valor">"primary"</span>
+├── <span class="parametro">time_min</span>: <span class="valor">"2025-01-17T00:00:00Z"</span>
+├── <span class="parametro">time_max</span>: <span class="valor">"2025-01-24T00:00:00Z"</span>
+├── <span class="parametro">query</span>: <span class="valor">"reunión"</span>
+└── <span class="tipo">return</span>: [{ summary, start, end }]</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('calendario', 'hechizo-buscar-huecos')">Buscar huecos</span>
+                        <span class="relacionado" onclick="irAHechizo('email', 'hechizo-buscar-correos')">Buscar correos</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-buscar-huecos">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◉</span>
+                        <div class="hechizo-info"><h3>Buscar huecos</h3><span class="mini-desc">Encuentra tiempo libre</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">conexión</span><span class="requisito">Google Calendar</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">libre</div><div class="formula-texto">"¿Cuándo tengo tiempo libre esta semana?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">con otros</div><div class="formula-texto">"¿Cuándo estamos libres <span class="variable">[email]</span> y yo?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Lee todos los eventos en el rango de tiempo especificado, identifica bloques libres entre eventos y sugiere franjas horarias disponibles.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>No considera horario laboral automáticamente</li><li>Puede no detectar eventos "todo el día"</li><li>Requiere acceso a todos los calendarios implicados</li></ul></div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="capa capa-3">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">●</span><span class="capa-titulo">Archimago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="codigo-bloque"><div class="codigo-titulo">comando</div><pre class="codigo"><span class="comando">find_free_time</span>
+├── <span class="parametro">calendar_ids</span>: [<span class="valor">"primary"</span>, <span class="valor">"otro@email"</span>]
+├── <span class="parametro">time_min</span>: <span class="valor">"..."</span>
+├── <span class="parametro">time_max</span>: <span class="valor">"..."</span>
+└── <span class="tipo">return</span>: [<span class="valor">"Lun 10-12"</span>, <span class="valor">"Mar 15-17"</span>]</pre></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('calendario', 'hechizo-ver-agenda')">Ver agenda</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ESCUELA: PYTHON 𓆙 -->
+        <section id="escuela-python" class="escuela-contenido">
+            <div class="escuela-intro" style="border-left-color: var(--success);">
+                <h2>𓆙 Escuela de Python</h2>
+                <p>La serpiente antigua. Sabiduría para aprendices de código.</p>
+            </div>
+
+            <article class="hechizo" id="hechizo-no-entiendes">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">◎</span>
+                        <div class="hechizo-info"><h3>Cuando no entiendes</h3><span class="mini-desc">Pide explicaciones claras</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">simple</div><div class="formula-texto">"Explícame <span class="variable">[concepto]</span> como si tuviera 10 años"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ejemplo</div><div class="formula-texto">"Dame un ejemplo muy simple de <span class="variable">[concepto]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">paso a paso</div><div class="formula-texto">"Explícame paso a paso cómo funciona <span class="variable">[código]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">analogía</div><div class="formula-texto">"¿Con qué puedo comparar <span class="variable">[concepto]</span> de la vida real?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-errores')">Cuando tienes errores</span>
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-practicar')">Cuando quieres practicar</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-errores">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">▽</span>
+                        <div class="hechizo-info"><h3>Cuando tienes errores</h3><span class="mini-desc">Entiende y arregla bugs</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">entender</div><div class="formula-texto">"Me sale este error: <span class="variable">[error]</span>. ¿Qué significa?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">arreglar</div><div class="formula-texto">"Mi código da error. ¿Puedes revisarlo?"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">prevenir</div><div class="formula-texto">"¿Qué errores típicos se cometen con <span class="variable">[tema]</span>?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                    <div class="capa capa-2">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">◐</span><span class="capa-titulo">Mago</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <p class="mecanismo-texto">Cuando copies un error, incluye el mensaje completo. El "traceback" cuenta la historia de qué pasó y en qué línea.</p>
+                            <div class="limitaciones"><div class="limitaciones-titulo">Limitaciones</div><ul><li>Necesitas copiar el error completo para ayuda efectiva</li><li>Errores de sintaxis pueden confundir sin contexto</li><li>Claude no ejecuta código, solo lo analiza</li></ul></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-practicar">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">⚡</span>
+                        <div class="hechizo-info"><h3>Cuando quieres practicar</h3><span class="mini-desc">Ejercicios a tu nivel</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">ejercicio</div><div class="formula-texto">"Dame un ejercicio de <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">fácil</div><div class="formula-texto">"Dame un ejercicio muy fácil de <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">corregir</div><div class="formula-texto">"¿Está bien mi solución?"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-no-entiendes')">Cuando no entiendes</span>
+                        <span class="relacionado" onclick="irAHechizo('codigo', 'hechizo-ejecutar-codigo')">Ejecutar código</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="hechizo" id="hechizo-repasar">
+                <div class="hechizo-cabecera" onclick="toggleHechizo(this)">
+                    <div class="hechizo-titulo">
+                        <span class="hechizo-icono">≡</span>
+                        <div class="hechizo-info"><h3>Cuando quieres repasar</h3><span class="mini-desc">Resúmenes y chuletas</span></div>
+                    </div>
+                    <span class="hechizo-flecha">▽</span>
+                </div>
+                <div class="hechizo-contenido">
+                    <div class="requisitos"><span class="requisito">nativo</span></div>
+                    <div class="capa capa-1 abierta">
+                        <div class="capa-header" onclick="toggleCapa(this)"><span class="capa-nivel">○</span><span class="capa-titulo">Aprendiz</span><span class="capa-flecha">▽</span></div>
+                        <div class="capa-contenido">
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">resumen</div><div class="formula-texto">"Resúmeme lo más importante de <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">chuleta</div><div class="formula-texto">"Hazme una chuleta de <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                            <div class="formula" onclick="copiarFormula(this)"><div class="formula-situacion">quiz</div><div class="formula-texto">"Hazme preguntas para ver si entendí <span class="variable">[tema]</span>"</div><span class="copiado">✓</span></div>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-errores')">Cuando tienes errores</span>
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-repasar')">Cuando quieres repasar</span>
+                        </div>
+                    </div>
+                
+                    <div class="hechizos-relacionados">
+                        <div class="relacionados-titulo">🔗 Hechizos relacionados</div>
+                        <div class="relacionados-lista">
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-practicar')">Cuando quieres practicar</span>
+                        <span class="relacionado" onclick="irAHechizo('python', 'hechizo-no-entiendes')">Cuando no entiendes</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- LA REJILLA MISTERIOSA (se transforma en trampilla) -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="rejilla-container" id="rejilla-container">
+            <div class="rejilla" id="rejilla">
+                <div class="rejilla-lineas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LA TRAMPILLA (oculta hasta el combo secreto) -->
+        <div class="trampilla-container" id="trampilla-container" style="display: none;">
+            <div class="trampilla" onclick="abrirSotano()">
+                <div class="trampilla-simbolo">▽</div>
+                <div class="trampilla-texto">EL SÓTANO</div>
+                <div class="trampilla-subtexto">hay algo más abajo</div>
+                <div class="antorchas-preview">
+                    <span class="antorcha-mini" id="prev-1">𐤠</span>
+                    <span class="antorcha-mini" id="prev-2">𐤡</span>
+                    <span class="antorcha-mini" id="prev-3">𐤢</span>
+                    <span class="antorcha-mini" id="prev-4">𐤣</span>
+                    <span class="antorcha-mini" id="prev-5">𐤤</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- EL SÓTANO -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <section id="sotano">
+            <div class="volver-superficie" onclick="volverSuperficie()">△ volver a la superficie</div>
+            
+            <div class="sotano-header">
+                <h2>◉ El Sótano</h2>
+                <p>Cinco antorchas. Cinco principios.<br>Se encienden con comprensión, no con clics.</p>
+            </div>
+
+            <div class="antorchas-container">
+                <!-- ANTORCHA 1: La Separación -->
+                <div class="antorcha" id="antorcha-1" onmouseenter="iniciarRevelacion(1)" onmouseleave="cancelarRevelacion(1)">
+                    <div class="antorcha-header" onclick="toggleAntorcha(1)">
+                        <span class="antorcha-llama">𐤠</span>
+                        <span class="antorcha-titulo">Primera Antorcha — La Separación</span>
+                    </div>
+                    <div class="antorcha-pregunta">
+                        El que piensa no ejecuta.<br>
+                        El que ejecuta no decide la estrategia.<br><br>
+                        <em>¿Por qué el Maestro nunca pica código?</em>
+                    </div>
+                    <div class="revelacion" id="revelacion-1">
+                        <div class="revelacion-icono">◈</div>
+                        <div class="revelacion-texto" id="texto-rev-1"></div>
+                    </div>
+                    <textarea class="antorcha-input" id="input-1" placeholder="Escribe lo que entiendes..." oninput="guardarReflexion(1)"></textarea>
+                    <div class="antorcha-reflexion" id="reflexion-1" style="display:none;">
+                        <div class="antorcha-reflexion-titulo">Tu reflexión guardada</div>
+                        <div class="antorcha-reflexion-texto" id="texto-reflexion-1"></div>
+                    </div>
+                </div>
+
+                <!-- ANTORCHA 2: La Delegación -->
+                <div class="antorcha" id="antorcha-2" onmouseenter="iniciarRevelacion(2)" onmouseleave="cancelarRevelacion(2)">
+                    <div class="antorcha-header" onclick="toggleAntorcha(2)">
+                        <span class="antorcha-llama">𐤡</span>
+                        <span class="antorcha-titulo">Segunda Antorcha — La Delegación</span>
+                    </div>
+                    <div class="antorcha-pregunta">
+                        Cada tarea al lugar correcto.<br>
+                        El sistema es más que sus partes.<br><br>
+                        <em>¿Por qué no puede uno solo hacerlo todo?</em>
+                    </div>
+                    <div class="revelacion" id="revelacion-2">
+                        <div class="revelacion-icono">◈</div>
+                        <div class="revelacion-texto" id="texto-rev-2"></div>
+                    </div>
+                    <textarea class="antorcha-input" id="input-2" placeholder="Escribe lo que entiendes..." oninput="guardarReflexion(2)"></textarea>
+                    <div class="antorcha-reflexion" id="reflexion-2" style="display:none;">
+                        <div class="antorcha-reflexion-titulo">Tu reflexión guardada</div>
+                        <div class="antorcha-reflexion-texto" id="texto-reflexion-2"></div>
+                    </div>
+                </div>
+
+                <!-- ANTORCHA 3: El Contexto Sagrado -->
+                <div class="antorcha" id="antorcha-3" onmouseenter="iniciarRevelacion(3)" onmouseleave="cancelarRevelacion(3)">
+                    <div class="antorcha-header" onclick="toggleAntorcha(3)">
+                        <span class="antorcha-llama">𐤢</span>
+                        <span class="antorcha-titulo">Tercera Antorcha — El Contexto Sagrado</span>
+                    </div>
+                    <div class="antorcha-pregunta">
+                        Sin contexto no hay continuidad.<br>
+                        El conocimiento debe preservarse.<br><br>
+                        <em>¿Qué se pierde cuando una conversación termina?</em>
+                    </div>
+                    <div class="revelacion" id="revelacion-3">
+                        <div class="revelacion-icono">◈</div>
+                        <div class="revelacion-texto" id="texto-rev-3"></div>
+                    </div>
+                    <textarea class="antorcha-input" id="input-3" placeholder="Escribe lo que entiendes..." oninput="guardarReflexion(3)"></textarea>
+                    <div class="antorcha-reflexion" id="reflexion-3" style="display:none;">
+                        <div class="antorcha-reflexion-titulo">Tu reflexión guardada</div>
+                        <div class="antorcha-reflexion-texto" id="texto-reflexion-3"></div>
+                    </div>
+                </div>
+
+                <!-- ANTORCHA 4: El Recurso Finito -->
+                <div class="antorcha" id="antorcha-4" onmouseenter="iniciarRevelacion(4)" onmouseleave="cancelarRevelacion(4)">
+                    <div class="antorcha-header" onclick="toggleAntorcha(4)">
+                        <span class="antorcha-llama">𐤣</span>
+                        <span class="antorcha-titulo">Cuarta Antorcha — El Recurso Finito</span>
+                    </div>
+                    <div class="antorcha-pregunta">
+                        Cada palabra cuesta.<br>
+                        La eficiencia no es rapidez. Es precisión.<br><br>
+                        <em>¿Por qué pedir bien es mejor que pedir mucho?</em>
+                    </div>
+                    <div class="revelacion" id="revelacion-4">
+                        <div class="revelacion-icono">◈</div>
+                        <div class="revelacion-texto" id="texto-rev-4"></div>
+                    </div>
+                    <textarea class="antorcha-input" id="input-4" placeholder="Escribe lo que entiendes..." oninput="guardarReflexion(4)"></textarea>
+                    <div class="antorcha-reflexion" id="reflexion-4" style="display:none;">
+                        <div class="antorcha-reflexion-titulo">Tu reflexión guardada</div>
+                        <div class="antorcha-reflexion-texto" id="texto-reflexion-4"></div>
+                    </div>
+                </div>
+
+                <!-- ANTORCHA 5: El Patrón -->
+                <div class="antorcha" id="antorcha-5" onmouseenter="iniciarRevelacion(5)" onmouseleave="cancelarRevelacion(5)">
+                    <div class="antorcha-header" onclick="toggleAntorcha(5)">
+                        <span class="antorcha-llama">𐤤</span>
+                        <span class="antorcha-titulo">Quinta Antorcha — El Patrón</span>
+                    </div>
+                    <div class="antorcha-pregunta">
+                        Los principios son inmutables.<br>
+                        La implementación se adapta.<br><br>
+                        <em>¿Qué es lo que permanece cuando todo cambia?</em>
+                    </div>
+                    <div class="revelacion" id="revelacion-5">
+                        <div class="revelacion-icono">◈</div>
+                        <div class="revelacion-texto" id="texto-rev-5"></div>
+                    </div>
+                    <textarea class="antorcha-input" id="input-5" placeholder="Escribe lo que entiendes..." oninput="guardarReflexion(5)"></textarea>
+                    <div class="antorcha-reflexion" id="reflexion-5" style="display:none;">
+                        <div class="antorcha-reflexion-titulo">Tu reflexión guardada</div>
+                        <div class="antorcha-reflexion-texto" id="texto-reflexion-5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LA PUERTA AL MANIFESTO -->
+            <div class="manifesto-puerta cerrada" id="puerta-manifesto">
+                <div class="manifesto-simbolo">◉</div>
+                <div class="manifesto-texto" id="manifesto-texto">
+                    Cuando las cinco antorchas estén encendidas,<br>
+                    el Manifesto se revelará.
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>El Grimorio de Claude — v4.0</p>
+            <p style="margin-top: 0.5rem; font-size: 0.7rem;">Carlos & Claude — 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════
+        // ESTADO DEL GRIMORIO
+        // ═══════════════════════════════════════════════════════
+        let estado = {
+            antorchas: [false, false, false, false, false],
+            reflexiones: ['', '', '', '', ''],
+            sotanoDesbloqueado: false
+        };
+        
+        // Estado del combo secreto
+        let comboEstado = {
+            paso: 0,  // 0 = nada, 1 = aprendiz clickeado
+            timeout: null
+        };
+
+        // Cargar estado guardado
+        function cargarEstado() {
+            const guardado = localStorage.getItem('grimorio_estado');
+            if (guardado) {
+                estado = JSON.parse(guardado);
+                // Restaurar reflexiones en inputs
+                for (let i = 1; i <= 5; i++) {
+                    const input = document.getElementById('input-' + i);
+                    if (input && estado.reflexiones[i-1]) {
+                        input.value = estado.reflexiones[i-1];
+                        if (estado.reflexiones[i-1].length > 50) {
+                            encenderAntorcha(i);
+                        }
+                    }
+                }
+                // Si el sótano ya fue desbloqueado, mostrarlo
+                if (estado.sotanoDesbloqueado) {
+                    mostrarTrampilla(false); // Sin animación
+                }
+                actualizarAntorchasPreview();
+            }
+        }
+
+        function guardarEstado() {
+            localStorage.setItem('grimorio_estado', JSON.stringify(estado));
+        }
+        
+        // ═══════════════════════════════════════════════════════
+        // COMBO SECRETO: ○ + ◐
+        // ═══════════════════════════════════════════════════════
+        function comboSecreto(tipo) {
+            // Si ya está desbloqueado, no hacer nada especial
+            if (estado.sotanoDesbloqueado) return;
+            
+            const grimorio = document.getElementById('grimorio');
+            const leyendaAprendiz = document.getElementById('leyenda-aprendiz');
+            const leyendaMago = document.getElementById('leyenda-mago');
+            
+            if (tipo === 'aprendiz') {
+                // Primer paso del combo
+                comboEstado.paso = 1;
+                leyendaAprendiz.classList.add('activado');
+                
+                // Temblor leve
+                grimorio.classList.add('temblor-leve');
+                setTimeout(() => grimorio.classList.remove('temblor-leve'), 500);
+                
+                // Timeout: si no hace el segundo clic en 3 segundos, resetear
+                if (comboEstado.timeout) clearTimeout(comboEstado.timeout);
+                comboEstado.timeout = setTimeout(() => {
+                    comboEstado.paso = 0;
+                    leyendaAprendiz.classList.remove('activado');
+                }, 3000);
+                
+            } else if (tipo === 'mago' && comboEstado.paso === 1) {
+                // ¡COMBO COMPLETADO!
+                comboEstado.paso = 0;
+                if (comboEstado.timeout) clearTimeout(comboEstado.timeout);
+                
+                leyendaAprendiz.classList.remove('activado');
+                leyendaMago.classList.add('activado');
+                setTimeout(() => leyendaMago.classList.remove('activado'), 1000);
+                
+                // TEMBLOR FUERTE
+                grimorio.classList.add('temblor-fuerte');
+                
+                // Revelar el sótano después del temblor
+                setTimeout(() => {
+                    grimorio.classList.remove('temblor-fuerte');
+                    mostrarTrampilla(true); // Con animación
+                }, 800);
+                
+            } else if (tipo === 'archimago') {
+                // Easter egg sutil si clickean archimago
+                const leyendaArchimago = document.getElementById('leyenda-archimago');
+                leyendaArchimago.style.color = 'var(--gold)';
+                setTimeout(() => leyendaArchimago.style.color = '', 500);
+            } else {
+                // Cualquier otro clic resetea el combo
+                comboEstado.paso = 0;
+                leyendaAprendiz.classList.remove('activado');
+            }
+        }
+        
+        function mostrarTrampilla(conAnimacion) {
+            const rejilla = document.getElementById('rejilla');
+            const rejillaContainer = document.getElementById('rejilla-container');
+            const trampillaContainer = document.getElementById('trampilla-container');
+            
+            estado.sotanoDesbloqueado = true;
+            guardarEstado();
+            
+            if (conAnimacion) {
+                // Animar rejilla abriéndose
+                rejilla.classList.add('abriendo');
+                
+                setTimeout(() => {
+                    rejillaContainer.style.display = 'none';
+                    trampillaContainer.classList.add('emergiendo');
+                }, 600);
+            } else {
+                // Sin animación (al cargar si ya estaba desbloqueado)
+                rejillaContainer.style.display = 'none';
+                trampillaContainer.style.display = 'block';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // ENTRADA
+        // ═══════════════════════════════════════════════════════
+        function entrar() {
+            document.getElementById('entrada').classList.add('oculto');
+            setTimeout(() => { 
+                document.getElementById('grimorio').classList.add('visible'); 
+                cargarEstado();
+            }, 800);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // NAVEGACIÓN ESCUELAS
+        // ═══════════════════════════════════════════════════════
+        function mostrarEscuela(escuela) {
+            document.getElementById('mensaje-inicial').style.display = 'none';
+            document.getElementById('sotano').classList.remove('visible');
+            document.querySelectorAll('.escuela-contenido').forEach(el => el.classList.remove('visible'));
+            document.querySelectorAll('.escuela-btn').forEach(btn => btn.classList.remove('activa'));
+            
+            const seccion = document.getElementById('escuela-' + escuela);
+            if (seccion) seccion.classList.add('visible');
+            
+            if (event && event.target) {
+                const btn = event.target.closest('.escuela-btn');
+                if (btn) btn.classList.add('activa');
+            }
+        }
+
+        function toggleHechizo(cabecera) {
+            cabecera.parentElement.classList.toggle('abierto');
+        }
+
+        function toggleCapa(header) {
+            header.parentElement.classList.toggle('abierta');
+        }
+
+        function copiarFormula(elemento) {
+            const texto = elemento.querySelector('.formula-texto').textContent;
+            navigator.clipboard.writeText(texto).then(() => {
+                elemento.classList.add('mostrar-copiado');
+                setTimeout(() => { elemento.classList.remove('mostrar-copiado'); }, 1200);
+            });
+        }
+
+        function irAHechizo(escuela, hechizoId) {
+            mostrarEscuela(escuela);
+            setTimeout(() => {
+                const hechizo = document.getElementById(hechizoId);
+                if (hechizo) {
+                    hechizo.classList.add('abierto');
+                    hechizo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 300);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SÓTANO
+        // ═══════════════════════════════════════════════════════
+        
+        // Traducciones pa' mortales
+        const revelaciones = {
+            1: "Tú decides qué hacer. Claude lo hace. No mezcles roles.",
+            2: "Un especialista por trabajo. Nadie lo hace todo bien.",
+            3: "Si no le cuentas qué pasó antes, empieza de cero.",
+            4: "Pide bien una vez. No pidas mal diez veces.",
+            5: "Las herramientas cambian. La filosofía permanece."
+        };
+        
+        let timersRevelacion = {};
+        let revelacionMostrada = {};
+        
+        function iniciarRevelacion(num) {
+            // Cancelar timer anterior si existe
+            if (timersRevelacion[num]) {
+                clearTimeout(timersRevelacion[num]);
+            }
+            
+            // Iniciar nuevo timer de 4 segundos
+            timersRevelacion[num] = setTimeout(() => {
+                mostrarRevelacion(num);
+            }, 4000);
+        }
+        
+        function cancelarRevelacion(num) {
+            // Cancelar el timer si el ratón sale
+            if (timersRevelacion[num]) {
+                clearTimeout(timersRevelacion[num]);
+                timersRevelacion[num] = null;
+            }
+        }
+        
+        function mostrarRevelacion(num) {
+            if (revelacionMostrada[num]) return; // Ya se mostró
+            
+            const contenedor = document.getElementById('revelacion-' + num);
+            const textoDiv = document.getElementById('texto-rev-' + num);
+            const mensaje = revelaciones[num];
+            
+            // Mostrar contenedor
+            contenedor.classList.add('visible');
+            
+            // Animar letras una por una
+            animarLetras(textoDiv, mensaje);
+            
+            revelacionMostrada[num] = true;
+        }
+        
+        function animarLetras(contenedor, texto) {
+            contenedor.innerHTML = '';
+            
+            // Crear array de caracteres con sus posiciones finales
+            const caracteres = texto.split('');
+            
+            // Primero: mostrar letras desordenadas
+            const letrasDesordenadas = [...caracteres].sort(() => Math.random() - 0.5);
+            
+            letrasDesordenadas.forEach((char, i) => {
+                const span = document.createElement('span');
+                span.className = 'letra';
+                span.textContent = char === ' ' ? '\u00A0' : char;
+                span.style.animationDelay = (i * 30) + 'ms';
+                contenedor.appendChild(span);
+            });
+            
+            // Después de 1 segundo: reordenar al texto correcto
+            setTimeout(() => {
+                contenedor.innerHTML = '';
+                caracteres.forEach((char, i) => {
+                    const span = document.createElement('span');
+                    span.className = 'letra';
+                    span.textContent = char === ' ' ? '\u00A0' : char;
+                    span.style.animationDelay = (i * 25) + 'ms';
+                    contenedor.appendChild(span);
+                });
+            }, 1200);
+        }
+
+        function abrirSotano() {
+            document.getElementById('mensaje-inicial').style.display = 'none';
+            document.querySelectorAll('.escuela-contenido').forEach(el => el.classList.remove('visible'));
+            document.querySelectorAll('.escuela-btn').forEach(btn => btn.classList.remove('activa'));
+            document.getElementById('sotano').classList.add('visible');
+        }
+
+        function volverSuperficie() {
+            document.getElementById('sotano').classList.remove('visible');
+            document.getElementById('mensaje-inicial').style.display = 'block';
+        }
+
+        function toggleAntorcha(num) {
+            // Las antorchas no se togglean con click, solo se expanden/contraen
+        }
+
+        function guardarReflexion(num) {
+            const input = document.getElementById('input-' + num);
+            const texto = input.value.trim();
+            estado.reflexiones[num - 1] = texto;
+            
+            // Si hay suficiente texto, encender antorcha
+            if (texto.length > 50) {
+                encenderAntorcha(num);
+            } else {
+                apagarAntorcha(num);
+            }
+            
+            guardarEstado();
+        }
+
+        function encenderAntorcha(num) {
+            estado.antorchas[num - 1] = true;
+            document.getElementById('antorcha-' + num).classList.add('encendida');
+            document.getElementById('prev-' + num).classList.add('encendida');
+            
+            // Mostrar reflexión guardada
+            const reflexionDiv = document.getElementById('reflexion-' + num);
+            const textoDiv = document.getElementById('texto-reflexion-' + num);
+            textoDiv.textContent = estado.reflexiones[num - 1];
+            reflexionDiv.style.display = 'block';
+            
+            verificarManifesto();
+            guardarEstado();
+        }
+
+        function apagarAntorcha(num) {
+            estado.antorchas[num - 1] = false;
+            document.getElementById('antorcha-' + num).classList.remove('encendida');
+            document.getElementById('prev-' + num).classList.remove('encendida');
+            document.getElementById('reflexion-' + num).style.display = 'none';
+            
+            verificarManifesto();
+            guardarEstado();
+        }
+
+        function actualizarAntorchasPreview() {
+            for (let i = 1; i <= 5; i++) {
+                if (estado.antorchas[i-1]) {
+                    document.getElementById('prev-' + i).classList.add('encendida');
+                    document.getElementById('antorcha-' + i).classList.add('encendida');
+                }
+            }
+            verificarManifesto();
+        }
+
+        function verificarManifesto() {
+            const todasEncendidas = estado.antorchas.every(a => a === true);
+            const puerta = document.getElementById('puerta-manifesto');
+            const texto = document.getElementById('manifesto-texto');
+            
+            if (todasEncendidas) {
+                puerta.classList.remove('cerrada');
+                puerta.classList.add('abierta');
+                texto.innerHTML = `
+                    <div style="margin-bottom: 1rem;">◉ Las cinco antorchas arden ◉</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); line-height: 1.8;">
+                        Has comprendido los principios.<br>
+                        El Manifesto aguarda en TIER_2.<br><br>
+                        <em>Esto es solo el comienzo.</em>
+                    </div>
+                `;
+            } else {
+                puerta.classList.add('cerrada');
+                puerta.classList.remove('abierta');
+                const encendidas = estado.antorchas.filter(a => a).length;
+                texto.innerHTML = `
+                    Cuando las cinco antorchas estén encendidas,<br>
+                    el Manifesto se revelará.<br>
+                    <span style="font-size: 0.75rem; opacity: 0.5;">${encendidas}/5</span>
+                `;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // ENTRADA CON TECLADO
+        // ═══════════════════════════════════════════════════════
+        document.addEventListener('keydown', (e) => {
+            const entrada = document.getElementById('entrada');
+            if ((e.key === 'Enter' || e.key === ' ') && entrada && !entrada.classList.contains('oculto')) {
+                e.preventDefault();
+                entrar();
+            }
+        });
+
+        // Cargar estado al inicio (por si se salta la entrada)
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarEstado();
+        });
+    </script>
+</body>
+</html>
